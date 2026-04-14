@@ -722,7 +722,7 @@
   </style>
 </head>
 <body>
-  <main class="container">
+   <div class="container">
     <!-- Toast para mensagens -->
     <div id="toast" class="toast">
       <i class="fas fa-check-circle"></i>
@@ -730,7 +730,7 @@
     </div>
     
     <!-- Modal para alterar senha -->
-     <div id="change-password-modal" class="modal" role="dialog" aria-modal="true">
+    <div id="change-password-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
           <h3>Alterar Senha</h3>
@@ -739,23 +739,23 @@
 
         <div class="modal-body">
           <div class="form-group">
-            <label for="current-password">Senha Atual</label>
+            <label>Senha Atual</label>
             <input type="password" id="current-password" placeholder="Digite sua senha atual">
           </div>
 
           <div class="form-group">
             <label for="new-password">Nova Senha</label>
-            <input type="password" id="new-password" placeholder="Digite a nova senha">
+            <label>Nova Senha</label>
           </div>
 
           <div class="form-group">
             <label for="confirm-password">Confirmar Nova Senha</label>
-            <input type="password" id="confirm-password" placeholder="Confirme a nova senha">
+            <label>Confirmar Nova Senha</label>
           </div>
-
-          <button class="form-btn" id="submit-password" type="button">
-            Alterar Senha
+             <button class="form-btn" id="submit-password">
+            <i class="fas fa-key"></i> Alterar Senha
           </button>
+           <p id="password-error" style="color: red; margin-top: 20px;"></p>
 
           <p id="password-error"></p>
         </div>
@@ -763,95 +763,88 @@
     </div>
     <!-- LOGIN -->
     <div class="auth-container" id="login-container">
-      <h2>Bem-vindo ao Sistema EstoquePro</h2>
-
-      <label for="username">Usuário</label>
-      <input type="text" id="username" placeholder="Usuário" autocomplete="username" required>
-
-      <label for="password">Senha</label>
-      <input type="password" id="password" placeholder="Senha" autocomplete="current-password" required>
-
-      <button type="button" onclick="login()">Entrar</button>
-
-      <p class="auth-switch">
-        Não tem uma conta?
-        <a href="#" onclick="showRegisterForm()">Registre-se</a>
-      </p>
-
-      <p id="login-error"></p>
+       <h2>Bem-vindo ao EstoquePro</h2>
+      <input type="text" id="username" placeholder="Usuário" required>
+      <input type="password" id="password" placeholder="Senha" required>
+      <button onclick="login()">Entrar</button>
+      <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterForm()">Registre-se</a></p>
     </div>
 
     <!-- REGISTER -->
     <div class="auth-container" id="register-container" style="display: none;">
       <h2>Criar Nova Conta</h2>
 
-      <label for="reg-name">Nome completo</label>
+      
       <input type="text" id="reg-name" placeholder="Nome completo" required>
-
-      <label for="reg-email">Email</label>
-      <input type="email" id="reg-email" placeholder="Email" autocomplete="email" required>
-
-      <label for="reg-password">Senha</label>
-      <input type="password" id="reg-password" placeholder="Senha" autocomplete="new-password" required>
+      <input type="email" id="reg-email" placeholder="Email" required>
+      <input type="password" id="reg-password" placeholder="Senha" required>
 
       <label for="reg-confirm-password">Confirmar senha</label>
       <input type="password" id="reg-confirm-password" placeholder="Confirmar senha" required>
-
-      <button type="button" onclick="register()">Registrar</button>
-
-      <p class="auth-switch">
-        Já tem uma conta?
-        <a href="#" onclick="showLoginForm()">Faça login</a>
-      </p>
-
+      <button onclick="register()">Registrar</button>
+      <p class="auth-switch">Já tem uma conta? <a href="#" onclick="showLoginForm()">Faça login</a></p>
+      
       <p id="register-error"></p>
     </div>
 
-    <!-- SISTEMA -->
-    <section id="system-content" style="display: none;">
-
-      <header id="main-header" role="banner">
+   <!-- Sistema principal (inicialmente oculto) -->
+    <div id="system-content" style="display: none;">
+      <header id="main-header">
         <div class="logo-area">
+           <div class="logo">
+            <i class="fas fa-boxes"></i>
+          </div>
           <div class="logo">📦</div>
           <h1>Controle de Estoque</h1>
         </div>
-
-        <nav class="user-menu">
+         <div class="user-menu">
           <div class="user-info" id="user-menu-btn">
             <div class="avatar" id="user-avatar">U</div>
             <div class="username" id="username-display">Usuário</div>
+             <i class="fas fa-chevron-down"></i>
           </div>
 
           <div class="dropdown-menu" id="user-dropdown">
             <a href="#" class="dropdown-item" id="change-password-btn">
-              Alterar Senha
+               <i class="fas fa-lock"></i> Alterar Senha
             </a>
             <a href="#" class="dropdown-item logout" id="logout-btn">
-              Sair
+               <i class="fas fa-sign-out-alt"></i> Sair
             </a>
           </div>
-        </nav>
+         </div>
       </header>
 
-      <div class="actions">
-        <button type="button" onclick="showAddForm()">Adicionar Item</button>
-        <button type="button" onclick="toggleDashboard()">Visualizar Estoque</button>
+     <div class="actions" id="actions">
+        <button onclick="showAddForm()">
+          <i class="fas fa-plus-circle"></i> Adicionar Item
+        </button>
+        <button onclick="toggleDashboard()">
+          <i class="fas fa-chart-bar"></i> Visualizar Estoque
+        </button>
       </div>
 
-      <div id="form-container"></div>
+      <div id="form-container" class="form-container"></div>
 
       <div class="inventory-container">
-        <h2>Itens no Estoque</h2>
+        <div class="table-controls">
+          <h2>Itens no Estoque</h2>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Pesquisar item...">
+          </div>
+        </div>
 
-        <input type="text" id="search-input" placeholder="Pesquisar item...">
-
-        <div id="inventory-container"></div>
+         <div id="dashboard-container" class="dashboard-container">
       </div>
 
       <div id="dashboard-container" style="display:none;">
         <h2>Dashboard de Estoque</h2>
-        <canvas id="estoqueChart"></canvas>
-      </div>
+        <div class="chart-container">
+          <canvas id="estoqueChart"></canvas>
+        </div>
+       </div>
+  </div>
 
     </section>
 
