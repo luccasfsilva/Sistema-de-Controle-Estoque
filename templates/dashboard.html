@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Estoque</title>
+    <title>Dashboard de Estoque - Ordenado por Data</title>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -162,11 +162,22 @@
             border-radius: 5px;
             font-size: 16px;
         }
+        
+        .edit-btn, .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 0 5px;
+        }
+        
+        .edit-btn:hover { color: var(--primary); }
+        .delete-btn:hover { color: var(--danger); }
     </style>
 </head>
 <body>
     <header>
-        <h1>Dashboard de Estoque</h1>
+        <h1>Dashboard de Estoque - Ordenado por Data</h1>
     </header>
     
     <div class="container">
@@ -207,10 +218,10 @@
                 </div>
             </div>
             
-            <!-- Gráfico de Linha -->
+            <!-- Gráfico de Linha (ordenado por data) -->
             <div class="card">
                 <div class="card-header">
-                    <h3>Movimentação Mensal</h3>
+                    <h3>Movimentação Mensal (Ordenado por Data)</h3>
                 </div>
                 <div class="chart-container">
                     <canvas id="lineChart"></canvas>
@@ -230,231 +241,256 @@
     </div>
 
     <script>
-        // Funções CRUD (mantidas do seu código original)
+        // ---------- DADOS GLOBAIS (simulando banco de dados) ----------
+        let itens = [
+            { codigo: '001', nome: 'Teclado Gamer RGB', qtd: 20, saida: 5, data: '2024-04-09', setor: 'TI' },
+            { codigo: '002', nome: 'Mouse Sem Fio Ergonômico', qtd: 30, saida: 10, data: '2024-04-11', setor: 'TI' },
+            { codigo: '003', nome: 'Monitor LED 24 polegadas', qtd: 15, saida: 2, data: '2024-04-30', setor: 'Hardware' },
+            { codigo: '004', nome: 'Cadeira de Escritório Premium', qtd: 10, saida: 1, data: '2024-05-14', setor: 'Mobiliário' },
+            { codigo: '005', nome: 'Teclado Mecânico', qtd: 60, saida: 30, data: '2025-06-01', setor: 'TI' },
+            { codigo: '2035', nome: 'Anel de Led', qtd: 90, saida: 7, data: '2025-06-01', setor: 'TI' }
+        ];
+
+        // Variáveis globais para os gráficos (para poder atualizar)
+        let barChart, pieChart, lineChart, towerChart;
+
+        // ---------- FUNÇÕES CRUD ----------
         function showAddForm() {
             const formContainer = document.getElementById('form-container');
             formContainer.innerHTML = `
                 <h2>Adicionar Item</h2>
                 <form id="addForm">
-                    <div class="form-group">
-                        <label for="codigo">Código:</label>
-                        <input type="text" id="codigo" placeholder="Código do Produto" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" id="nome" placeholder="Nome do Item" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="quantidade">Quantidade:</label>
-                        <input type="number" id="quantidade" placeholder="Quantidade" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="saida">Saída:</label>
-                        <input type="number" id="saida" placeholder="Quantidade de Saída" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="data">Data:</label>
-                        <input type="date" id="data" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="setor">Setor:</label>
-                        <input type="text" id="setor" placeholder="Setor" required>
-                    </div>
+                    <div class="form-group"><label>Código:</label><input type="text" id="codigo" required></div>
+                    <div class="form-group"><label>Nome:</label><input type="text" id="nome" required></div>
+                    <div class="form-group"><label>Quantidade:</label><input type="number" id="quantidade" required></div>
+                    <div class="form-group"><label>Saída:</label><input type="number" id="saida" required></div>
+                    <div class="form-group"><label>Data:</label><input type="date" id="data" required></div>
+                    <div class="form-group"><label>Setor:</label><input type="text" id="setor" required></div>
                     <button type="submit" class="btn btn-primary">Adicionar</button>
                 </form>
             `;
-            
             document.getElementById('addForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                // ... (código de submissão)
+                const novoItem = {
+                    codigo: document.getElementById('codigo').value,
+                    nome: document.getElementById('nome').value,
+                    qtd: parseInt(document.getElementById('quantidade').value),
+                    saida: parseInt(document.getElementById('saida').value),
+                    data: document.getElementById('data').value,
+                    setor: document.getElementById('setor').value
+                };
+                itens.push(novoItem);
+                viewInventory();
+                atualizarTodosGraficos();
+                formContainer.innerHTML = '';
+                alert('Item adicionado com sucesso!');
             });
         }
-        
-        // ... (outras funções showUpdateForm, showRemoveForm, viewInventory)
 
-        // Inicializar gráficos quando o DOM estiver pronto
-        document.addEventListener('DOMContentLoaded', function() {
-            viewInventory();
-            initCharts();
-        });
+        function showUpdateForm() {
+            const formContainer = document.getElementById('form-container');
+            formContainer.innerHTML = `
+                <h2>Atualizar Item</h2>
+                <form id="updateForm">
+                    <div class="form-group"><label>Código do Item:</label><input type="text" id="codigoBusca" required placeholder="Digite o código"></div>
+                    <div class="form-group"><label>Novo Nome:</label><input type="text" id="nome"></div>
+                    <div class="form-group"><label>Nova Quantidade:</label><input type="number" id="quantidade"></div>
+                    <div class="form-group"><label>Nova Saída:</label><input type="number" id="saida"></div>
+                    <div class="form-group"><label>Nova Data:</label><input type="date" id="data"></div>
+                    <div class="form-group"><label>Novo Setor:</label><input type="text" id="setor"></div>
+                    <button type="submit" class="btn btn-secondary">Atualizar</button>
+                </form>
+            `;
+            document.getElementById('updateForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const codigo = document.getElementById('codigoBusca').value;
+                const item = itens.find(i => i.codigo === codigo);
+                if (item) {
+                    if (document.getElementById('nome').value) item.nome = document.getElementById('nome').value;
+                    if (document.getElementById('quantidade').value) item.qtd = parseInt(document.getElementById('quantidade').value);
+                    if (document.getElementById('saida').value) item.saida = parseInt(document.getElementById('saida').value);
+                    if (document.getElementById('data').value) item.data = document.getElementById('data').value;
+                    if (document.getElementById('setor').value) item.setor = document.getElementById('setor').value;
+                    viewInventory();
+                    atualizarTodosGraficos();
+                    formContainer.innerHTML = '';
+                    alert('Item atualizado!');
+                } else {
+                    alert('Código não encontrado!');
+                }
+            });
+        }
 
-        // Função para inicializar os gráficos
-        function initCharts() {
-            // Dados de exemplo (substituir com dados reais da API)
-            const inventoryData = {
-                setores: ['Elétrica', 'Hidráulica', 'Ferramentas', 'Pintura'],
-                valores: [12000, 8500, 6200, 4300],
-                distribuicao: [35, 25, 20, 20],
-                meses: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                entradas: [120, 95, 150, 80, 110, 130],
-                saidas: [80, 70, 110, 60, 90, 100],
-                topItens: ['Fio 2.5mm', 'Tubo PVC', 'Tinta Branca', 'Chave de Fenda', 'Lâmpada LED'],
-                estoqueItens: [850, 720, 600, 550, 480]
-            };
+        function showRemoveForm() {
+            const formContainer = document.getElementById('form-container');
+            formContainer.innerHTML = `
+                <h2>Remover Item</h2>
+                <form id="removeForm">
+                    <div class="form-group"><label>Código do Item:</label><input type="text" id="codigoRemove" required></div>
+                    <button type="submit" class="btn btn-danger">Remover</button>
+                </form>
+            `;
+            document.getElementById('removeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const codigo = document.getElementById('codigoRemove').value;
+                const index = itens.findIndex(i => i.codigo === codigo);
+                if (index !== -1) {
+                    itens.splice(index, 1);
+                    viewInventory();
+                    atualizarTodosGraficos();
+                    formContainer.innerHTML = '';
+                    alert('Item removido!');
+                } else {
+                    alert('Código não encontrado!');
+                }
+            });
+        }
 
-            // Gráfico de Barras - Estoque por Setor
-            new Chart(document.getElementById('barChart'), {
+        // Exibir inventário (tabela ordenada por data)
+        function viewInventory() {
+            const container = document.getElementById('inventory-container');
+            // Ordena os itens por data (mais antigo -> mais recente)
+            const itensOrdenados = [...itens].sort((a, b) => new Date(a.data) - new Date(b.data));
+            
+            let html = `<h2>Inventário Completo (ordenado por data)</h2>
+                        <table>
+                            <thead><tr><th>Código</th><th>Nome</th><th>Quantidade</th><th>Saída</th><th>Após Saída</th><th>Data</th><th>Setor</th><th>Ações</th></tr></thead>
+                            <tbody>`;
+            itensOrdenados.forEach(item => {
+                const aposSaida = item.qtd - item.saida;
+                html += `<tr>
+                            <td>${item.codigo}</td>
+                            <td>${item.nome}</td>
+                            <td>${item.qtd}</td>
+                            <td>${item.saida}</td>
+                            <td>${aposSaida}</td>
+                            <td>${new Date(item.data).toLocaleDateString('pt-BR')}</td>
+                            <td>${item.setor}</td>
+                            <td>
+                                <button class="edit-btn" onclick="editarItem('${item.codigo}')">✏️</button>
+                                <button class="delete-btn" onclick="removerItem('${item.codigo}')">🗑️</button>
+                            </td>
+                        </tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // Funções auxiliares para editar/remover direto da tabela
+        window.editarItem = function(codigo) {
+            const item = itens.find(i => i.codigo === codigo);
+            if (item) {
+                document.getElementById('form-container').innerHTML = `
+                    <h2>Editar Item</h2>
+                    <form id="editForm">
+                        <div class="form-group"><label>Código:</label><input type="text" value="${item.codigo}" disabled></div>
+                        <div class="form-group"><label>Nome:</label><input type="text" id="nome" value="${item.nome}" required></div>
+                        <div class="form-group"><label>Quantidade:</label><input type="number" id="qtd" value="${item.qtd}" required></div>
+                        <div class="form-group"><label>Saída:</label><input type="number" id="saida" value="${item.saida}" required></div>
+                        <div class="form-group"><label>Data:</label><input type="date" id="data" value="${item.data}" required></div>
+                        <div class="form-group"><label>Setor:</label><input type="text" id="setor" value="${item.setor}" required></div>
+                        <button type="submit" class="btn btn-secondary">Salvar</button>
+                    </form>
+                `;
+                document.getElementById('editForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    item.nome = document.getElementById('nome').value;
+                    item.qtd = parseInt(document.getElementById('qtd').value);
+                    item.saida = parseInt(document.getElementById('saida').value);
+                    item.data = document.getElementById('data').value;
+                    item.setor = document.getElementById('setor').value;
+                    viewInventory();
+                    atualizarTodosGraficos();
+                    document.getElementById('form-container').innerHTML = '';
+                    alert('Item atualizado!');
+                });
+            }
+        };
+
+        window.removerItem = function(codigo) {
+            if (confirm('Tem certeza que deseja remover este item?')) {
+                const index = itens.findIndex(i => i.codigo === codigo);
+                if (index !== -1) itens.splice(index, 1);
+                viewInventory();
+                atualizarTodosGraficos();
+            }
+        };
+
+        // ---------- GRÁFICOS (COM ORDENAÇÃO POR DATA NO GRÁFICO DE LINHA) ----------
+        function atualizarTodosGraficos() {
+            // 1. Estoque por Setor (Barras)
+            const setores = [...new Set(itens.map(i => i.setor))];
+            const valoresPorSetor = setores.map(s => 
+                itens.filter(i => i.setor === s).reduce((acc, i) => acc + (i.qtd * 10), 0) // valor fictício R$10 por item
+            );
+            if (barChart) barChart.destroy();
+            barChart = new Chart(document.getElementById('barChart'), {
                 type: 'bar',
-                data: {
-                    labels: inventoryData.setores,
-                    datasets: [{
-                        label: 'Valor em Estoque (R$)',
-                        data: inventoryData.valores,
-                        backgroundColor: [
-                            'rgba(52, 152, 219, 0.7)',
-                            'rgba(46, 204, 113, 0.7)',
-                            'rgba(155, 89, 182, 0.7)',
-                            'rgba(241, 196, 15, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(52, 152, 219, 1)',
-                            'rgba(46, 204, 113, 1)',
-                            'rgba(155, 89, 182, 1)',
-                            'rgba(241, 196, 15, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
+                data: { labels: setores, datasets: [{ label: 'Valor Estimado (R$)', data: valoresPorSetor, backgroundColor: '#3498db' }] },
+                options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Gráfico de Pizza - Distribuição de Itens
-            new Chart(document.getElementById('pieChart'), {
+            // 2. Distribuição (Pizza)
+            const qtdPorSetor = setores.map(s => itens.filter(i => i.setor === s).reduce((acc, i) => acc + i.qtd, 0));
+            if (pieChart) pieChart.destroy();
+            pieChart = new Chart(document.getElementById('pieChart'), {
                 type: 'pie',
-                data: {
-                    labels: inventoryData.setores,
-                    datasets: [{
-                        data: inventoryData.distribuicao,
-                        backgroundColor: [
-                            'rgba(231, 76, 60, 0.7)',
-                            'rgba(52, 152, 219, 0.7)',
-                            'rgba(46, 204, 113, 0.7)',
-                            'rgba(155, 89, 182, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(231, 76, 60, 1)',
-                            'rgba(52, 152, 219, 1)',
-                            'rgba(46, 204, 113, 1)',
-                            'rgba(155, 89, 182, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        }
-                    }
-                }
+                data: { labels: setores, datasets: [{ data: qtdPorSetor, backgroundColor: ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Gráfico de Linha - Movimentação Mensal
-            new Chart(document.getElementById('lineChart'), {
+            // 3. Gráfico de Linha (Movimentação Mensal) - ORDENADO POR DATA
+            // Agrupa entradas e saídas por mês/ano
+            const movimentos = {};
+            itens.forEach(item => {
+                const dataObj = new Date(item.data);
+                const mesAno = `${dataObj.getFullYear()}-${dataObj.getMonth() + 1}`; // formato YYYY-M
+                const mesRotulo = dataObj.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+                if (!movimentos[mesAno]) {
+                    movimentos[mesAno] = { rotulo: mesRotulo, entradas: 0, saidas: 0 };
+                }
+                movimentos[mesAno].entradas += item.qtd;
+                movimentos[mesAno].saidas += item.saida;
+            });
+            // Converte para array e ordena por data (chave YYYY-M)
+            const movimentosArray = Object.entries(movimentos).map(([key, val]) => ({ key, ...val }));
+            movimentosArray.sort((a, b) => a.key.localeCompare(b.key)); // ordenação cronológica
+            
+            const labelsLinha = movimentosArray.map(m => m.rotulo);
+            const entradasLinha = movimentosArray.map(m => m.entradas);
+            const saidasLinha = movimentosArray.map(m => m.saidas);
+            
+            if (lineChart) lineChart.destroy();
+            lineChart = new Chart(document.getElementById('lineChart'), {
                 type: 'line',
                 data: {
-                    labels: inventoryData.meses,
+                    labels: labelsLinha,
                     datasets: [
-                        {
-                            label: 'Entradas',
-                            data: inventoryData.entradas,
-                            borderColor: 'rgba(46, 204, 113, 1)',
-                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                            tension: 0.3,
-                            fill: true
-                        },
-                        {
-                            label: 'Saídas',
-                            data: inventoryData.saidas,
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                            tension: 0.3,
-                            fill: true
-                        }
+                        { label: 'Entradas (quantidade)', data: entradasLinha, borderColor: '#2ecc71', fill: true },
+                        { label: 'Saídas (quantidade)', data: saidasLinha, borderColor: '#e74c3c', fill: true }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Gráfico de Torre (barra horizontal) - Top Itens
-            new Chart(document.getElementById('towerChart'), {
+            // 4. Top Itens (Torre)
+            const topItens = [...itens].sort((a,b) => b.qtd - a.qtd).slice(0,5);
+            if (towerChart) towerChart.destroy();
+            towerChart = new Chart(document.getElementById('towerChart'), {
                 type: 'bar',
                 data: {
-                    labels: inventoryData.topItens,
-                    datasets: [{
-                        label: 'Quantidade em Estoque',
-                        data: inventoryData.estoqueItens,
-                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        borderWidth: 1
-                    }]
+                    labels: topItens.map(i => i.nome),
+                    datasets: [{ label: 'Quantidade', data: topItens.map(i => i.qtd), backgroundColor: '#3498db' }]
                 },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        y: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
             });
         }
 
-        // Função para buscar dados reais da API (exemplo)
-        async function fetchInventoryData() {
-            try {
-                const response = await fetch('/api/inventory/analytics');
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Erro ao buscar dados para gráficos:', error);
-                return null;
-            }
-        }
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            viewInventory();
+            atualizarTodosGraficos();
+        });
     </script>
 </body>
 </html>
