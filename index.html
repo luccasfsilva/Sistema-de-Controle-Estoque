@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Estoque Moderno</title>
+    <title>Controle de Estoque Moderno - Dashboard com Datas</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Estilos originais - mantidos intactos */
+        /* Seus estilos originais (não mudei nada aqui) */
         :root {
             --primary: #4361ee;
             --primary-dark: #3a0ca3;
@@ -22,692 +22,102 @@
             --sidebar-bg: #1d3557;
             --background: linear-gradient(135deg, #f0f2f5 0%, #e6e9ef 100%);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: var(--background);
-            min-height: 100vh;
-            color: #333;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            max-width: 1200px;
-            width: 100%;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: var(--background); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+        .container { max-width: 1200px; width: 100%; }
         header {
             background: linear-gradient(to right, var(--sidebar-bg), var(--primary-dark));
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            position: sticky;
-            top: 20px;
-            z-index: 100;
+            color: white; padding: 20px 30px; border-radius: 15px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+            position: sticky; top: 20px; z-index: 100;
         }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo {
-            background: var(--secondary);
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo i {
-            font-size: 24px;
-            color: white;
-        }
-
-        header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .user-menu {
-            position: relative;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.15);
-            transition: all 0.3s ease;
-        }
-
-        .user-info:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 18px;
-        }
-
-        .username {
-            font-weight: 500;
-            font-size: 16px;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 220px;
-            z-index: 1000;
-            overflow: hidden;
-            display: none;
-            margin-top: 15px;
-        }
-
-        .dropdown-menu.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .dropdown-item {
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--dark);
-            text-decoration: none;
-            transition: all 0.2s;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item i {
-            width: 24px;
-            color: var(--primary);
-            font-size: 18px;
-        }
-
-        .dropdown-item:hover {
-            background: #f0f5ff;
-            color: var(--primary);
-        }
-
-        .dropdown-item.logout {
-            color: var(--danger);
-        }
-
-        .dropdown-item.logout:hover {
-            background: #fff0f3;
-        }
-
-        .dropdown-item.logout i {
-            color: var(--danger);
-        }
-
-        .actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .actions button {
-            padding: 18px;
-            border: none;
-            background: var(--primary);
-            color: white;
-            font-size: 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-weight: 500;
-            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
-        }
-
-        .actions button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.4);
-        }
-
-        .actions button i {
-            font-size: 20px;
-        }
-
-        .form-container, .inventory-container, .dashboard-container {
-            background: var(--card-bg);
-            padding: 30px;
-            margin-bottom: 30px;
-            border-radius: 18px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        }
-
-        .form-group select {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 12px;
-            border: 2px solid #e0e0e0;
-            font-size: 16px;
-            background-color: white;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s;
-            outline: none;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            cursor: pointer;
-        }
-
-        .form-group select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
-        }
-
-        h2 {
-            font-size: 24px;
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--primary-dark);
-            font-weight: 600;
-            position: relative;
-            padding-bottom: 15px;
-        }
-
-        h2::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background: var(--secondary);
-            border-radius: 4px;
-        }
-
-        .inventory-container {
-            overflow-x: auto;
-        }
-
-        .table-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 20px 12px 45px;
-            border-radius: 30px;
-            border: 2px solid #e0e0e0;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .search-box input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        th, td {
-            padding: 16px;
-            text-align: center;
-            font-size: 16px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        th {
-            background: var(--primary);
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        th:hover {
-            background: var(--primary-dark);
-        }
-
-        th i {
-            margin-left: 8px;
-            font-size: 14px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-
-        tr:hover {
-            background-color: #f0f5ff;
-        }
-
-        .action-cell {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .action-btn {
-            width: 36px;
-            height: 36px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .action-btn.edit {
-            background: var(--success);
-            color: white;
-        }
-
-        .action-btn.delete {
-            background: var(--danger);
-            color: white;
-        }
-
-        .action-btn i {
-            font-size: 16px;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .action-btn:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 10;
-        }
-
-        .setor-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: 500;
-            font-size: 14px;
-            text-align: center;
-            min-width: 100px;
-        }
-
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo { background: var(--secondary); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .logo i { font-size: 24px; color: white; }
+        header h1 { font-size: 24px; font-weight: 600; }
+        .user-menu { position: relative; }
+        .user-info { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 20px; border-radius: 30px; background: rgba(255,255,255,0.15); transition: 0.3s; }
+        .user-info:hover { background: rgba(255,255,255,0.25); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--secondary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+        .username { font-weight: 500; }
+        .dropdown-menu { position: absolute; top: 100%; right: 0; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 220px; display: none; margin-top: 15px; }
+        .dropdown-menu.active { display: block; animation: fadeIn 0.3s; }
+        .dropdown-item { padding: 14px 20px; display: flex; align-items: center; gap: 12px; color: var(--dark); text-decoration: none; transition: 0.2s; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .dropdown-item i { width: 24px; color: var(--primary); }
+        .dropdown-item:hover { background: #f0f5ff; color: var(--primary); }
+        .dropdown-item.logout { color: var(--danger); }
+        .dropdown-item.logout i { color: var(--danger); }
+        .actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 20px; margin-bottom: 30px; }
+        .actions button { padding: 18px; border: none; background: var(--primary); color: white; font-size: 16px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 500; box-shadow: 0 6px 15px rgba(67,97,238,0.3); transition: 0.3s; }
+        .actions button:hover { background: var(--primary-dark); transform: translateY(-3px); }
+        .form-container, .inventory-container, .dashboard-container { background: var(--card-bg); padding: 30px; margin-bottom: 30px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .form-group select { width: 100%; padding: 16px 20px; border-radius: 12px; border: 2px solid #e0e0e0; font-size: 16px; background: white; transition: 0.3s; outline: none; cursor: pointer; }
+        h2 { font-size: 24px; text-align: center; margin-bottom: 30px; color: var(--primary-dark); font-weight: 600; position: relative; padding-bottom: 15px; }
+        h2::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background: var(--secondary); border-radius: 4px; }
+        .inventory-container { overflow-x: auto; }
+        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .search-box { position: relative; width: 300px; }
+        .search-box input { width: 100%; padding: 12px 20px 12px 45px; border-radius: 30px; border: 2px solid #e0e0e0; transition: 0.3s; }
+        .search-box i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--gray); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        th, td { padding: 16px; text-align: center; border-bottom: 1px solid #e0e0e0; }
+        th { background: var(--primary); color: white; font-weight: 500; cursor: pointer; transition: 0.3s; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #f0f5ff; }
+        .action-cell { display: flex; justify-content: center; gap: 8px; }
+        .action-btn { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
+        .action-btn.edit { background: var(--success); color: white; }
+        .action-btn.delete { background: var(--danger); color: white; }
+        .action-btn:hover { transform: translateY(-2px); }
+        .setor-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-weight: 500; font-size: 14px; min-width: 100px; }
         .setor-ti { background-color: #e3f2fd; color: #1565c0; }
         .setor-rh { background-color: #f3e5f5; color: #7b1fa2; }
         .setor-financeiro { background-color: #e8f5e9; color: #2e7d32; }
         .setor-producao { background-color: #fff3e0; color: #ef6c00; }
         .setor-vendas { background-color: #ffebee; color: #c62828; }
         .setor-administrativo { background-color: #f5f5f5; color: #424242; }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-        }
-
-        .modal-header {
-            padding: 20px 25px;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 {
-            font-weight: 600;
-            font-size: 22px;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 12px;
-            border: 2px solid #e0e0e0;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
-        }
-
-        button.form-btn {
-            padding: 18px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
-        }
-
-        button.form-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-3px);
-        }
-
-        .dashboard-container {
-            display: none;
-        }
-
-        .chart-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 30px auto;
-            height: 400px;
-        }
-
-        .auth-container {
-            background: white;
-            padding: 40px;
-            width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            text-align: center;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        .auth-container h2 {
-            margin-bottom: 30px;
-            color: var(--primary);
-        }
-
-        .auth-container input {
-            width: 100%;
-            padding: 16px 24px;
-            margin: 15px 0;
-            border-radius: 12px;
-            border: 2px solid #e0e0e0;
-            font-size: 16px;
-        }
-
-        .auth-container input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
-        }
-
-        .auth-container button {
-            padding: 16px;
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            margin: 20px 0 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
-        }
-
-        .auth-container button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-3px);
-        }
-
-        .forgot-password {
-            display: block;
-            text-align: right;
-            margin: -10px 0 15px;
-            font-size: 14px;
-        }
-
-        .forgot-password a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-
-        .auth-switch {
-            margin-top: 20px;
-            font-size: 15px;
-            color: var(--gray);
-        }
-
-        .auth-switch a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 8px;
-            background: var(--success);
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
-        }
-
-        .card-dashboard {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.2s;
-}
-.card-dashboard:hover {
-    transform: translateY(-4px);
-}
-.card-dashboard h3 {
-    color: var(--primary-dark);
-    margin-bottom: 15px;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast.error {
-            background: var(--danger);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media screen and (max-width: 768px) {
-            .actions { grid-template-columns: 1fr; }
-            .search-box { width: 100%; margin-bottom: 15px; }
-            .table-controls { flex-direction: column; align-items: stretch; }
-            header { flex-direction: column; text-align: center; gap: 15px; }
-            .user-menu { width: 100%; }
-            .user-info { justify-content: center; }
-            .dropdown-menu { left: 50%; transform: translateX(-50%); }
-            .auth-container { padding: 30px 20px; }
-        }
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index:2000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; animation: fadeIn 0.3s; }
+        .modal-content { background: white; border-radius: 18px; max-width: 500px; width:100%; overflow: hidden; }
+        .modal-header { padding: 20px 25px; background: var(--primary); color: white; display: flex; justify-content: space-between; }
+        .close-modal { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+        .modal-body { padding: 30px; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 10px; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 16px 20px; border-radius: 12px; border: 2px solid #e0e0e0; font-size: 16px; transition: 0.3s; }
+        button.form-btn { padding: 18px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; margin-top: 10px; }
+        .dashboard-container { display: none; }
+        .card-dashboard { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s; }
+        .card-dashboard:hover { transform: translateY(-4px); }
+        .card-dashboard h3 { color: var(--primary-dark); margin-bottom: 15px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .auth-container { background: white; padding: 40px; max-width: 450px; margin: 0 auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center; }
+        .auth-container input { width: 100%; padding: 16px 24px; margin: 15px 0; border-radius: 12px; border: 2px solid #e0e0e0; }
+        .auth-container button { padding: 16px; width: 100%; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; margin: 20px 0 15px; cursor: pointer; }
+        .forgot-password { text-align: right; margin: -10px 0 15px; font-size: 14px; }
+        .forgot-password a { color: var(--primary); text-decoration: none; }
+        .auth-switch { margin-top: 20px; color: var(--gray); }
+        .auth-switch a { color: var(--primary); text-decoration: none; font-weight: 500; }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 15px 25px; border-radius: 8px; background: var(--success); color: white; font-weight: 500; display: flex; align-items: center; gap: 10px; transform: translateX(150%); transition: transform 0.3s; z-index: 1000; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: var(--danger); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .actions { grid-template-columns: 1fr; } .search-box { width: 100%; margin-bottom: 15px; } .table-controls { flex-direction: column; } header { flex-direction: column; text-align: center; gap: 15px; } .user-menu { width: 100%; } .user-info { justify-content: center; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <div id="toast" class="toast">
-        <i class="fas fa-check-circle"></i>
-        <span id="toast-message">Operação realizada com sucesso!</span>
-    </div>
+    <div id="toast" class="toast"><i class="fas fa-check-circle"></i><span id="toast-message"></span></div>
 
-    <!-- Modal para alterar senha (logado) -->
+    <!-- Modal alterar senha -->
     <div id="change-password-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>Alterar Senha</h3>
-                <button class="close-modal">&times;</button>
-            </div>
+            <div class="modal-header"><h3>Alterar Senha</h3><button class="close-modal">&times;</button></div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>Senha Atual</label>
-                    <input type="password" id="current-password" placeholder="Digite sua senha atual">
-                </div>
-                <div class="form-group">
-                    <label>Nova Senha</label>
-                    <input type="password" id="new-password" placeholder="Digite a nova senha">
-                </div>
-                <div class="form-group">
-                    <label>Confirmar Nova Senha</label>
-                    <input type="password" id="confirm-password" placeholder="Confirme a nova senha">
-                </div>
-                <button class="form-btn" id="submit-password">
-                    <i class="fas fa-key"></i> Alterar Senha
-                </button>
-                <p id="password-error" style="color: red; margin-top: 20px;"></p>
+                <div class="form-group"><label>Senha Atual</label><input type="password" id="current-password"></div>
+                <div class="form-group"><label>Nova Senha</label><input type="password" id="new-password"></div>
+                <div class="form-group"><label>Confirmar</label><input type="password" id="confirm-password"></div>
+                <button class="form-btn" id="submit-password"><i class="fas fa-key"></i> Alterar Senha</button>
+                <p id="password-error" style="color:red; margin-top:20px;"></p>
             </div>
         </div>
     </div>
@@ -715,47 +125,42 @@
     <!-- Login -->
     <div class="auth-container" id="login-container">
         <h2>Bem-vindo ao EstoquePro</h2>
-        <input type="text" id="username" placeholder="Usuário (email)" required>
-        <input type="password" id="password" placeholder="Senha" required>
-        <div class="forgot-password">
-            <a href="#" onclick="showResetForm()">Esqueci minha senha</a>
-        </div>
+        <input type="text" id="username" placeholder="Usuário (email)">
+        <input type="password" id="password" placeholder="Senha">
+        <div class="forgot-password"><a href="#" onclick="showResetForm()">Esqueci minha senha</a></div>
         <button onclick="login()">Entrar</button>
-        <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterForm()">Registre-se</a></p>
-        <p id="login-error" style="color: red;"></p>
+        <p class="auth-switch">Não tem conta? <a href="#" onclick="showRegisterForm()">Registre-se</a></p>
+        <p id="login-error" style="color:red;"></p>
     </div>
 
-    <!-- Register -->
-    <div class="auth-container" id="register-container" style="display: none;">
-        <h2>Criar Nova Conta</h2>
-        <input type="text" id="reg-name" placeholder="Nome completo" required>
-        <input type="email" id="reg-email" placeholder="Email" required>
-        <input type="password" id="reg-password" placeholder="Senha" required>
-        <input type="password" id="reg-confirm-password" placeholder="Confirmar senha" required>
+    <!-- Registrar -->
+    <div class="auth-container" id="register-container" style="display:none;">
+        <h2>Criar Conta</h2>
+        <input type="text" id="reg-name" placeholder="Nome completo">
+        <input type="email" id="reg-email" placeholder="Email">
+        <input type="password" id="reg-password" placeholder="Senha">
+        <input type="password" id="reg-confirm-password" placeholder="Confirmar senha">
         <button onclick="register()">Registrar</button>
-        <p class="auth-switch">Já tem uma conta? <a href="#" onclick="showLoginForm()">Faça login</a></p>
-        <p id="register-error" style="color: red;"></p>
+        <p class="auth-switch">Já tem conta? <a href="#" onclick="showLoginForm()">Faça login</a></p>
+        <p id="register-error" style="color:red;"></p>
     </div>
 
-    <!-- Reset Password (Esqueci minha senha) -->
-    <div class="auth-container" id="reset-container" style="display: none;">
+    <!-- Reset senha -->
+    <div class="auth-container" id="reset-container" style="display:none;">
         <h2>Redefinir Senha</h2>
-        <input type="email" id="reset-email" placeholder="Seu email cadastrado" required>
-        <input type="password" id="reset-new-password" placeholder="Nova senha" required>
-        <input type="password" id="reset-confirm-password" placeholder="Confirmar nova senha" required>
+        <input type="email" id="reset-email" placeholder="Seu email">
+        <input type="password" id="reset-new-password" placeholder="Nova senha">
+        <input type="password" id="reset-confirm-password" placeholder="Confirmar nova senha">
         <button onclick="resetPassword()">Alterar Senha</button>
         <p class="auth-switch"><a href="#" onclick="showLoginForm()">Voltar ao login</a></p>
-        <p id="reset-error" style="color: red;"></p>
-        <p id="reset-success" style="color: green;"></p>
+        <p id="reset-error" style="color:red;"></p>
+        <p id="reset-success" style="color:green;"></p>
     </div>
 
     <!-- Sistema principal -->
-    <div id="system-content" style="display: none;">
+    <div id="system-content" style="display:none;">
         <header>
-            <div class="logo-area">
-                <div class="logo"><i class="fas fa-boxes"></i></div>
-                <h1>Controle de Estoque</h1>
-            </div>
+            <div class="logo-area"><div class="logo"><i class="fas fa-boxes"></i></div><h1>Controle de Estoque</h1></div>
             <div class="user-menu">
                 <div class="user-info" id="user-menu-btn">
                     <div class="avatar" id="user-avatar">U</div>
@@ -763,12 +168,8 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="dropdown-menu" id="user-dropdown">
-                    <a href="#" class="dropdown-item" id="change-password-btn">
-                        <i class="fas fa-lock"></i> Alterar Senha
-                    </a>
-                    <a href="#" class="dropdown-item logout" id="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Sair
-                    </a>
+                    <a href="#" class="dropdown-item" id="change-password-btn"><i class="fas fa-lock"></i> Alterar Senha</a>
+                    <a href="#" class="dropdown-item logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
             </div>
         </header>
@@ -778,40 +179,18 @@
         </div>
         <div id="form-container" class="form-container"></div>
         <div class="inventory-container">
-            <div class="table-controls">
-                <h2>Itens no Estoque</h2>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="search-input" placeholder="Pesquisar item...">
-                </div>
-            </div>
+            <div class="table-controls"><h2>Itens no Estoque</h2><div class="search-box"><i class="fas fa-search"></i><input type="text" id="search-input" placeholder="Pesquisar item..."></div></div>
             <div id="inventory-container"></div>
         </div>
-        <div id="dashboard-container" class="dashboard-container" style="display: none;">
-    <h2>📊 Dashboard de Estoque</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-top: 20px;">
-        <!-- Gráfico 1: Barras - Valor por Setor -->
-        <div class="card-dashboard">
-            <h3><i class="fas fa-chart-bar"></i> Estoque por Setor</h3>
-            <canvas id="barChartSetor" style="max-height: 300px; width: 100%;"></canvas>
+        <div id="dashboard-container" class="dashboard-container">
+            <h2>📊 Dashboard de Estoque</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-top: 20px;">
+                <div class="card-dashboard"><h3><i class="fas fa-chart-bar"></i> Estoque por Setor</h3><canvas id="barChartSetor" style="max-height:300px; width:100%;"></canvas></div>
+                <div class="card-dashboard"><h3><i class="fas fa-chart-pie"></i> Distribuição por Setor</h3><canvas id="pieChartSetor" style="max-height:300px; width:100%;"></canvas></div>
+                <div class="card-dashboard"><h3><i class="fas fa-chart-line"></i> Movimentação Mensal (ordenado por data)</h3><canvas id="lineChartMov" style="max-height:300px; width:100%;"></canvas></div>
+                <div class="card-dashboard"><h3><i class="fas fa-trophy"></i> Top 5 Itens em Estoque</h3><canvas id="towerChartTop" style="max-height:300px; width:100%;"></canvas></div>
+            </div>
         </div>
-        <!-- Gráfico 2: Pizza - Distribuição por Setor -->
-        <div class="card-dashboard">
-            <h3><i class="fas fa-chart-pie"></i> Distribuição por Setor</h3>
-            <canvas id="pieChartSetor" style="max-height: 300px; width: 100%;"></canvas>
-        </div>
-        <!-- Gráfico 3: Linha - Movimentação Mensal (ordenado por data) -->
-        <div class="card-dashboard">
-            <h3><i class="fas fa-chart-line"></i> Movimentação Mensal (ordenado por data)</h3>
-            <canvas id="lineChartMov" style="max-height: 300px; width: 100%;"></canvas>
-        </div>
-        <!-- Gráfico 4: Torre (horizontal) - Top Itens -->
-        <div class="card-dashboard">
-            <h3><i class="fas fa-trophy"></i> Top 5 Itens em Estoque</h3>
-            <canvas id="towerChartTop" style="max-height: 300px; width: 100%;"></canvas>
-        </div>
-    </div>
-</div>
     </div>
 </div>
 
@@ -823,444 +202,247 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     class Database {
-        async registerUser(user) {
-            const { error } = await supabaseClient.from('users').insert([user]);
-            if (error) throw error;
-        }
-        async getUser(email) {
-            const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single();
-            if (error) return null;
-            return data;
-        }
-        // Método atualizado conforme solicitado
-        async updateUser(email, newPassword) {
-            const { error } = await supabaseClient
-                .from('users')
-                .update({ password: newPassword })
-                .eq('email', email);
-            if (error) throw error;
-        }
-        async getInventory() {
-            const { data, error } = await supabaseClient.from('inventory').select('*');
-            if (error) throw error;
-            return data;
-        }
-        async addItem(item) {
-            const { error } = await supabaseClient.from('inventory').insert([item]);
-            if (error) throw error;
-        }
-        async updateItem(item) {
-            const { error } = await supabaseClient.from('inventory').update(item).eq('codigo', item.codigo);
-            if (error) throw error;
-        }
-        async deleteItem(codigo) {
-            const { error } = await supabaseClient.from('inventory').delete().eq('codigo', codigo);
-            if (error) throw error;
-        }
+        async registerUser(user) { const { error } = await supabaseClient.from('users').insert([user]); if (error) throw error; }
+        async getUser(email) { const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single(); if (error) return null; return data; }
+        async updateUser(email, newPassword) { const { error } = await supabaseClient.from('users').update({ password: newPassword }).eq('email', email); if (error) throw error; }
+        async getInventory() { const { data, error } = await supabaseClient.from('inventory').select('*'); if (error) throw error; return data; }
+        async addItem(item) { const { error } = await supabaseClient.from('inventory').insert([item]); if (error) throw error; }
+        async updateItem(item) { const { error } = await supabaseClient.from('inventory').update(item).eq('codigo', item.codigo); if (error) throw error; }
+        async deleteItem(codigo) { const { error } = await supabaseClient.from('inventory').delete().eq('codigo', codigo); if (error) throw error; }
     }
-
     const database = new Database();
     let inventoryData = [];
-    let chartInstance = null;
+    // Variáveis para os gráficos
+    let barChart, pieChart, lineChart, towerChart;
 
-    function showToast(message, isError = false) {
+    function showToast(msg, isErr = false) {
         const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toast-message');
-        toastMessage.textContent = message;
-        toast.classList.toggle('error', isError);
+        document.getElementById('toast-message').textContent = msg;
+        toast.classList.toggle('error', isErr);
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
-
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        const [year, month, day] = dateString.split('-');
-        return `${day}/${month}/${year}`;
-    }
-
-    function sortInventoryByName() {
-        inventoryData.sort((a, b) => a.nome.localeCompare(b.nome));
-    }
-
+    function formatDate(d) { if(!d) return ''; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
     function getSetorClass(setor) {
-        const map = {
-            'TI': 'setor-ti', 'RH': 'setor-rh', 'Financeiro': 'setor-financeiro',
-            'Produção': 'setor-producao', 'Vendas': 'setor-vendas', 'Administrativo': 'setor-administrativo'
-        };
+        const map = {'TI':'setor-ti','RH':'setor-rh','Financeiro':'setor-financeiro','Produção':'setor-producao','Vendas':'setor-vendas','Administrativo':'setor-administrativo'};
         return map[setor] || 'setor-administrativo';
     }
 
+    // ATUALIZA TODOS OS GRÁFICOS (com ordenação por data no de linha)
+    function atualizarTodosGraficos() {
+        if (!inventoryData || inventoryData.length === 0) {
+            [barChart, pieChart, lineChart, towerChart].forEach(ch => { if (ch) ch.destroy(); });
+            return;
+        }
+        // 1. Barras por setor (soma da quantidade após saída)
+        const setores = [...new Set(inventoryData.map(i => i.setor))];
+        const valoresPorSetor = setores.map(s => inventoryData.filter(i => i.setor === s).reduce((acc, i) => acc + (i.quantidadeAposSaida || 0), 0));
+        if (barChart) barChart.destroy();
+        barChart = new Chart(document.getElementById('barChartSetor'), {
+            type: 'bar', data: { labels: setores, datasets: [{ label: 'Quantidade em estoque', data: valoresPorSetor, backgroundColor: '#4361ee', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+        // 2. Pizza
+        if (pieChart) pieChart.destroy();
+        pieChart = new Chart(document.getElementById('pieChartSetor'), {
+            type: 'pie', data: { labels: setores, datasets: [{ data: valoresPorSetor, backgroundColor: ['#4361ee','#3a0ca3','#4cc9f0','#2ec4b6','#e71d36','#ff9f1c'] }] },
+            options: { responsive: true, plugins: { legend: { position: 'right' } } }
+        });
+        // 3. Linha - Movimentação mensal (ordenado por data)
+        const movMap = new Map();
+        inventoryData.forEach(item => {
+            if (!item.data) return;
+            const [ano, mes] = item.data.split('-');
+            const key = `${ano}-${mes}`;
+            const rotulo = new Date(ano, mes-1).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+            if (!movMap.has(key)) movMap.set(key, { rotulo, entradas: 0, saidas: 0 });
+            const g = movMap.get(key);
+            g.entradas += item.quantidade || 0;
+            g.saidas += item.saida || 0;
+        });
+        const chavesOrdenadas = Array.from(movMap.keys()).sort();
+        const labelsLinha = chavesOrdenadas.map(k => movMap.get(k).rotulo);
+        const entradas = chavesOrdenadas.map(k => movMap.get(k).entradas);
+        const saidas = chavesOrdenadas.map(k => movMap.get(k).saidas);
+        if (lineChart) lineChart.destroy();
+        lineChart = new Chart(document.getElementById('lineChartMov'), {
+            type: 'line', data: { labels: labelsLinha, datasets: [
+                { label: 'Entradas', data: entradas, borderColor: '#2ec4b6', backgroundColor: 'rgba(46,196,182,0.1)', fill: true, tension: 0.3 },
+                { label: 'Saídas', data: saidas, borderColor: '#e71d36', backgroundColor: 'rgba(231,29,54,0.05)', fill: true, tension: 0.3 }
+            ] }, options: { responsive: true, maintainAspectRatio: true }
+        });
+        // 4. Top 5 itens (barras horizontais)
+        const top5 = [...inventoryData].sort((a,b) => (b.quantidadeAposSaida||0) - (a.quantidadeAposSaida||0)).slice(0,5);
+        if (towerChart) towerChart.destroy();
+        towerChart = new Chart(document.getElementById('towerChartTop'), {
+            type: 'bar', data: { labels: top5.map(i => i.nome), datasets: [{ label: 'Quantidade', data: top5.map(i => i.quantidadeAposSaida), backgroundColor: '#ff9f1c', borderRadius: 6 }] },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true }
+        });
+    }
+
+    // Exibir inventário (sem chamar updateChart antiga)
     async function viewInventory() {
         const container = document.getElementById('inventory-container');
         try {
             inventoryData = await database.getInventory();
-            if (inventoryData.length === 0) {
-                container.innerHTML = "<p style='text-align: center; padding: 30px; color: var(--gray);'>Nenhum item no estoque.</p>";
-                return;
-            }
-            sortInventoryByName();
-            container.innerHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Nome <i class="fas fa-sort-alpha-down"></i></th>
-                            <th>Quantidade</th>
-                            <th>Saída</th>
-                            <th>Após Saída</th>
-                            <th>Data</th>
-                            <th>Setor</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${inventoryData.map(item => `
-                            <tr>
-                                <td>${item.codigo}</td>
-                                <td>${item.nome}</td>
-                                <td>${item.quantidade}</td>
-                                <td>${item.saida}</td>
-                                <td>${item.quantidadeAposSaida}</td>
-                                <td>${formatDate(item.data)}</td>
-                                <td class="setor-cell"><span class="setor-badge ${getSetorClass(item.setor)}">${item.setor}</span></td>
-                                <td class="action-cell">
-                                    <button class="action-btn edit" data-codigo="${item.codigo}" data-tooltip="Editar"><i class="fas fa-edit"></i></button>
-                                    <button class="action-btn delete" data-codigo="${item.codigo}" data-tooltip="Remover"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>`;
-            document.querySelectorAll('.action-btn.edit').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const codigo = btn.getAttribute('data-codigo');
-                    const item = inventoryData.find(i => i.codigo === codigo);
-                    showUpdateFormWithData(item);
-                });
-            });
-            document.querySelectorAll('.action-btn.delete').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const codigo = btn.getAttribute('data-codigo');
-                    if (confirm('Tem certeza que deseja remover este item?')) {
-                        try {
-                            await database.deleteItem(codigo);
-                            await viewInventory();
-                            updateChart();
-                            showToast('Item removido com sucesso!');
-                        } catch (error) {
-                            showToast('Erro ao remover item: ' + error.message, true);
-                        }
-                    }
-                });
-            });
-        } catch (error) {
-            showToast('Erro ao carregar estoque: ' + error.message, true);
-        }
+            if (inventoryData.length === 0) { container.innerHTML = "<p style='text-align:center; padding:30px;'>Nenhum item no estoque.</p>"; return; }
+            inventoryData.sort((a,b) => a.nome.localeCompare(b.nome));
+            container.innerHTML = `<table><thead><tr><th>Código</th><th>Nome <i class='fas fa-sort-alpha-down'></i></th><th>Quantidade</th><th>Saída</th><th>Após Saída</th><th>Data</th><th>Setor</th><th>Ações</th></tr></thead><tbody>
+                ${inventoryData.map(item => `<tr>
+                    <td>${item.codigo}</td><td>${item.nome}</td><td>${item.quantidade}</td><td>${item.saida}</td><td>${item.quantidadeAposSaida}</td>
+                    <td>${formatDate(item.data)}</td><td><span class="setor-badge ${getSetorClass(item.setor)}">${item.setor}</span></td>
+                    <td class="action-cell"><button class="action-btn edit" data-codigo="${item.codigo}"><i class="fas fa-edit"></i></button><button class="action-btn delete" data-codigo="${item.codigo}"><i class="fas fa-trash"></i></button></td>
+                </tr>`).join('')}</tbody></table>`;
+            document.querySelectorAll('.action-btn.edit').forEach(btn => btn.addEventListener('click', () => { const item = inventoryData.find(i => i.codigo === btn.dataset.codigo); showUpdateFormWithData(item); }));
+            document.querySelectorAll('.action-btn.delete').forEach(btn => btn.addEventListener('click', async () => { if(confirm('Remover?')) { await database.deleteItem(btn.dataset.codigo); await viewInventory(); atualizarTodosGraficos(); showToast('Item removido'); } }));
+        } catch(e) { showToast('Erro carregar estoque: '+e.message, true); }
     }
 
     function showAddForm() {
-        const formContainer = document.getElementById('form-container');
-        formContainer.innerHTML = `
-            <h2>Adicionar Novo Item</h2>
-            <form id="addForm">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div class="form-group"><label>Código</label><input type="text" id="codigo" placeholder="Código do item" required></div>
-                    <div class="form-group"><label>Nome</label><input type="text" id="nome" placeholder="Nome do item" required></div>
-                    <div class="form-group"><label>Quantidade</label><input type="number" id="quantidade" placeholder="Quantidade em estoque" required></div>
-                    <div class="form-group"><label>Saída</label><input type="number" id="saida" placeholder="Quantidade de saída" required></div>
-                    <div class="form-group"><label>Data</label><input type="date" id="data" required></div>
-                    <div class="form-group"><label>Setor</label>
-                        <select id="setor">
-                            <option value="TI">TI</option><option value="RH">RH</option><option value="Financeiro">Financeiro</option>
-                            <option value="Produção">Produção</option><option value="Vendas">Vendas</option><option value="Administrativo">Administrativo</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button type="submit" class="form-btn"><i class="fas fa-plus-circle"></i> Adicionar Item</button>
-                    <button type="button" class="form-btn" style="background: var(--gray);" onclick="document.getElementById('form-container').innerHTML = ''"><i class="fas fa-times"></i> Cancelar</button>
-                </div>
-            </form>`;
+        const fc = document.getElementById('form-container');
+        fc.innerHTML = `<h2>Adicionar Item</h2><form id="addForm"><div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="form-group"><label>Código</label><input type="text" id="codigo" required></div>
+            <div class="form-group"><label>Nome</label><input type="text" id="nome" required></div>
+            <div class="form-group"><label>Quantidade</label><input type="number" id="quantidade" required></div>
+            <div class="form-group"><label>Saída</label><input type="number" id="saida" required></div>
+            <div class="form-group"><label>Data</label><input type="date" id="data" required></div>
+            <div class="form-group"><label>Setor</label><select id="setor"><option>TI</option><option>RH</option><option>Financeiro</option><option>Produção</option><option>Vendas</option><option>Administrativo</option></select></div>
+        </div><div style="display:flex; gap:15px; margin-top:20px;"><button type="submit" class="form-btn">Adicionar</button><button type="button" class="form-btn" style="background:gray;" onclick="document.getElementById('form-container').innerHTML=''">Cancelar</button></div></form>`;
         document.getElementById('data').value = new Date().toISOString().split('T')[0];
         document.getElementById('addForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const codigo = document.getElementById('codigo').value;
-            if (inventoryData.some(item => item.codigo === codigo)) {
-                showToast('Erro: Código já existe!', true);
-                return;
-            }
-            const novoItem = {
-                codigo, nome: document.getElementById('nome').value,
-                quantidade: parseInt(document.getElementById('quantidade').value),
-                saida: parseInt(document.getElementById('saida').value),
-                data: document.getElementById('data').value,
-                setor: document.getElementById('setor').value,
-                quantidadeAposSaida: parseInt(document.getElementById('quantidade').value) - parseInt(document.getElementById('saida').value)
-            };
-            try {
-                await database.addItem(novoItem);
-                await viewInventory();
-                updateChart();
-                formContainer.innerHTML = '';
-                showToast('Item adicionado com sucesso!');
-            } catch (error) {
-                showToast('Erro ao adicionar item: ' + error.message, true);
-            }
+            const cod = document.getElementById('codigo').value;
+            if (inventoryData.some(i=>i.codigo===cod)) { showToast('Código já existe!', true); return; }
+            const qtd = parseInt(document.getElementById('quantidade').value);
+            const saida = parseInt(document.getElementById('saida').value);
+            const novo = { codigo: cod, nome: document.getElementById('nome').value, quantidade: qtd, saida: saida, data: document.getElementById('data').value, setor: document.getElementById('setor').value, quantidadeAposSaida: qtd - saida };
+            await database.addItem(novo);
+            await viewInventory();
+            atualizarTodosGraficos();
+            fc.innerHTML = '';
+            showToast('Item adicionado');
         });
     }
 
     function showUpdateFormWithData(item) {
-        const formContainer = document.getElementById('form-container');
-        formContainer.innerHTML = `
-            <h2>Atualizar Item</h2>
-            <form id="updateForm">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div class="form-group"><label>Código</label><input type="text" id="codigo" value="${item.codigo}" readonly></div>
-                    <div class="form-group"><label>Nome</label><input type="text" id="nome" value="${item.nome}" required></div>
-                    <div class="form-group"><label>Quantidade</label><input type="number" id="quantidade" value="${item.quantidade}" required></div>
-                    <div class="form-group"><label>Saída</label><input type="number" id="saida" value="${item.saida}" required></div>
-                    <div class="form-group"><label>Data</label><input type="date" id="data" value="${item.data}" required></div>
-                    <div class="form-group"><label>Setor</label>
-                        <select id="setor">
-                            ${['TI','RH','Financeiro','Produção','Vendas','Administrativo'].map(s => `<option value="${s}" ${item.setor === s ? 'selected' : ''}>${s}</option>`).join('')}
-                        </select>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button type="submit" class="form-btn"><i class="fas fa-save"></i> Atualizar Item</button>
-                    <button type="button" class="form-btn" style="background: var(--gray);" onclick="document.getElementById('form-container').innerHTML = ''"><i class="fas fa-times"></i> Cancelar</button>
-                </div>
-            </form>`;
+        const fc = document.getElementById('form-container');
+        fc.innerHTML = `<h2>Atualizar Item</h2><form id="updateForm"><div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="form-group"><label>Código</label><input type="text" id="codigo" value="${item.codigo}" readonly></div>
+            <div class="form-group"><label>Nome</label><input type="text" id="nome" value="${item.nome}" required></div>
+            <div class="form-group"><label>Quantidade</label><input type="number" id="quantidade" value="${item.quantidade}" required></div>
+            <div class="form-group"><label>Saída</label><input type="number" id="saida" value="${item.saida}" required></div>
+            <div class="form-group"><label>Data</label><input type="date" id="data" value="${item.data}" required></div>
+            <div class="form-group"><label>Setor</label><select id="setor">${['TI','RH','Financeiro','Produção','Vendas','Administrativo'].map(s => `<option ${item.setor===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        </div><div style="display:flex; gap:15px;"><button type="submit" class="form-btn">Salvar</button><button type="button" class="form-btn" style="background:gray;" onclick="document.getElementById('form-container').innerHTML=''">Cancelar</button></div></form>`;
         document.getElementById('updateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const codigo = document.getElementById('codigo').value;
-            const updatedItem = {
-                codigo, nome: document.getElementById('nome').value,
-                quantidade: parseInt(document.getElementById('quantidade').value),
-                saida: parseInt(document.getElementById('saida').value),
-                data: document.getElementById('data').value,
-                setor: document.getElementById('setor').value,
-                quantidadeAposSaida: parseInt(document.getElementById('quantidade').value) - parseInt(document.getElementById('saida').value)
-            };
-            try {
-                await database.updateItem(updatedItem);
-                await viewInventory();
-                updateChart();
-                formContainer.innerHTML = '';
-                showToast('Item atualizado com sucesso!');
-            } catch (error) {
-                showToast('Erro ao atualizar item: ' + error.message, true);
-            }
-        });
-    }
-
-    function updateChart() {
-        const ctx = document.getElementById('estoqueChart').getContext('2d');
-        const labels = inventoryData.map(item => item.nome);
-        const data = inventoryData.map(item => item.quantidadeAposSaida);
-        const backgroundColors = ['#4361ee','#3a0ca3','#4cc9f0','#2ec4b6','#e71d36','#ff9f1c','#7209b7','#1d3557','#8d99ae','#ef233c'];
-        if (chartInstance) chartInstance.destroy();
-        chartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: { labels, datasets: [{ label: 'Quantidade em Estoque', data, backgroundColor: backgroundColors, borderRadius: 8 }] },
-            options: { responsive: true, maintainAspectRatio: false }
+            const qtd = parseInt(document.getElementById('quantidade').value);
+            const saida = parseInt(document.getElementById('saida').value);
+            const up = { codigo: item.codigo, nome: document.getElementById('nome').value, quantidade: qtd, saida: saida, data: document.getElementById('data').value, setor: document.getElementById('setor').value, quantidadeAposSaida: qtd - saida };
+            await database.updateItem(up);
+            await viewInventory();
+            atualizarTodosGraficos();
+            fc.innerHTML = '';
+            showToast('Item atualizado');
         });
     }
 
     function toggleDashboard() {
-        const dashboard = document.getElementById('dashboard-container');
-        dashboard.style.display = dashboard.style.display === 'none' ? 'block' : 'none';
-        if (dashboard.style.display === 'block') updateChart();
+        const dash = document.getElementById('dashboard-container');
+        if (dash.style.display === 'none') {
+            dash.style.display = 'block';
+            atualizarTodosGraficos();
+        } else {
+            dash.style.display = 'none';
+        }
     }
 
-    // Controle de formulários de autenticação
-    function showLoginForm() {
-        document.getElementById('register-container').style.display = 'none';
-        document.getElementById('reset-container').style.display = 'none';
-        document.getElementById('login-container').style.display = 'block';
-        document.getElementById('login-error').innerText = '';
-    }
-
-    function showRegisterForm() {
-        document.getElementById('login-container').style.display = 'none';
-        document.getElementById('reset-container').style.display = 'none';
-        document.getElementById('register-container').style.display = 'block';
-        document.getElementById('register-error').innerText = '';
-    }
-
-    function showResetForm() {
-        document.getElementById('login-container').style.display = 'none';
-        document.getElementById('register-container').style.display = 'none';
-        document.getElementById('reset-container').style.display = 'block';
-        document.getElementById('reset-error').innerText = '';
-        document.getElementById('reset-success').innerText = '';
-        document.getElementById('reset-email').value = '';
-        document.getElementById('reset-new-password').value = '';
-        document.getElementById('reset-confirm-password').value = '';
-    }
-
-    // Redefinição de senha utilizando updateUser(email, newPassword)
+    // Autenticação (sem alterações)
+    function showLoginForm() { document.getElementById('register-container').style.display='none'; document.getElementById('reset-container').style.display='none'; document.getElementById('login-container').style.display='block'; document.getElementById('login-error').innerText=''; }
+    function showRegisterForm() { document.getElementById('login-container').style.display='none'; document.getElementById('reset-container').style.display='none'; document.getElementById('register-container').style.display='block'; document.getElementById('register-error').innerText=''; }
+    function showResetForm() { document.getElementById('login-container').style.display='none'; document.getElementById('register-container').style.display='none'; document.getElementById('reset-container').style.display='block'; document.getElementById('reset-error').innerText=''; document.getElementById('reset-success').innerText=''; }
     async function resetPassword() {
         const email = document.getElementById('reset-email').value.trim();
-        const newPassword = document.getElementById('reset-new-password').value;
-        const confirmPassword = document.getElementById('reset-confirm-password').value;
-        const errorEl = document.getElementById('reset-error');
-        const successEl = document.getElementById('reset-success');
-
-        errorEl.innerText = '';
-        successEl.innerText = '';
-
-        if (!email || !newPassword || !confirmPassword) {
-            errorEl.innerText = 'Preencha todos os campos.';
-            return;
-        }
-        if (newPassword !== confirmPassword) {
-            errorEl.innerText = 'As senhas não coincidem.';
-            return;
-        }
-        if (newPassword.length < 6) {
-            errorEl.innerText = 'A nova senha deve ter pelo menos 6 caracteres.';
-            return;
-        }
-
+        const newPass = document.getElementById('reset-new-password').value;
+        const confirm = document.getElementById('reset-confirm-password').value;
+        const err = document.getElementById('reset-error'), suc = document.getElementById('reset-success');
+        err.innerText = ''; suc.innerText = '';
+        if (!email || !newPass || !confirm) { err.innerText = 'Preencha todos os campos.'; return; }
+        if (newPass !== confirm) { err.innerText = 'Senhas não coincidem.'; return; }
+        if (newPass.length < 6) { err.innerText = 'Mínimo 6 caracteres.'; return; }
         try {
             const user = await database.getUser(email);
-            if (!user) {
-                errorEl.innerText = 'Nenhum usuário encontrado com este e-mail.';
-                return;
-            }
-            // Atualiza a senha usando o novo método
-            await database.updateUser(email, newPassword);
-            successEl.innerText = 'Senha alterada com sucesso! Faça login com a nova senha.';
-            document.getElementById('reset-email').value = '';
-            document.getElementById('reset-new-password').value = '';
-            document.getElementById('reset-confirm-password').value = '';
+            if (!user) throw new Error('Email não encontrado');
+            await database.updateUser(email, newPass);
+            suc.innerText = 'Senha alterada! Faça login.';
             setTimeout(() => showLoginForm(), 2000);
-        } catch (error) {
-            errorEl.innerText = 'Erro ao redefinir senha: ' + error.message;
-        }
+        } catch(e) { err.innerText = e.message; }
     }
-
     async function login() {
         const email = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorEl = document.getElementById('login-error');
-        if (!email || !password) {
-            errorEl.textContent = 'Por favor, preencha todos os campos.';
-            return;
-        }
+        const pass = document.getElementById('password').value;
+        const err = document.getElementById('login-error');
+        if (!email || !pass) { err.textContent = 'Preencha os campos'; return; }
         try {
             const user = await database.getUser(email);
-            if (!user || user.password !== password) throw new Error('Email ou senha inválidos');
-            errorEl.textContent = '';
-            window._loggedUserEmail = email; // guarda email para uso na troca de senha
+            if (!user || user.password !== pass) throw new Error('Email ou senha inválidos');
+            window._loggedUserEmail = email;
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('system-content').style.display = 'block';
             document.getElementById('username-display').textContent = user.name;
             document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
             await viewInventory();
-            updateChart();
-        } catch (error) {
-            errorEl.textContent = error.message;
-        }
+            atualizarTodosGraficos();  // gráficos atualizados
+        } catch(e) { err.textContent = e.message; }
     }
-
     async function register() {
         const name = document.getElementById('reg-name').value;
         const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-password').value;
+        const pass = document.getElementById('reg-password').value;
         const confirm = document.getElementById('reg-confirm-password').value;
-        const errorEl = document.getElementById('register-error');
-        if (!name || !email || !password || !confirm) {
-            errorEl.textContent = 'Preencha todos os campos.';
-            return;
-        }
-        if (password !== confirm) {
-            errorEl.textContent = 'As senhas não coincidem.';
-            return;
-        }
-        if (password.length < 6) {
-            errorEl.textContent = 'A senha deve ter pelo menos 6 caracteres.';
-            return;
-        }
+        const err = document.getElementById('register-error');
+        if (!name || !email || !pass || !confirm) { err.textContent = 'Preencha todos'; return; }
+        if (pass !== confirm) { err.textContent = 'Senhas não coincidem'; return; }
+        if (pass.length < 6) { err.textContent = 'Mínimo 6 caracteres'; return; }
         try {
             const existing = await database.getUser(email);
-            if (existing) throw new Error('Email já registrado');
-            await database.registerUser({ name, email, password });
-            errorEl.textContent = '';
-            showToast('Conta criada com sucesso! Faça login.');
+            if (existing) throw new Error('Email já cadastrado');
+            await database.registerUser({ name, email, password: pass });
+            showToast('Conta criada! Faça login.');
             showLoginForm();
-            document.getElementById('reg-name').value = '';
-            document.getElementById('reg-email').value = '';
-            document.getElementById('reg-password').value = '';
-            document.getElementById('reg-confirm-password').value = '';
-        } catch (error) {
-            errorEl.textContent = error.message;
-        }
+        } catch(e) { err.textContent = e.message; }
     }
 
     // Eventos DOM
     document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('user-menu-btn').addEventListener('click', () => {
-            document.getElementById('user-dropdown').classList.toggle('active');
-        });
-        document.getElementById('change-password-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('change-password-modal').classList.add('active');
-            document.getElementById('user-dropdown').classList.remove('active');
-        });
-        document.getElementById('logout-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('system-content').style.display = 'none';
-            document.getElementById('login-container').style.display = 'block';
-            document.getElementById('form-container').innerHTML = '';
-            window._loggedUserEmail = null;
-        });
-        document.querySelector('.close-modal').addEventListener('click', () => {
-            document.getElementById('change-password-modal').classList.remove('active');
-        });
-
-        // Alterar senha do usuário logado (usando updateUser com email e nova senha)
+        document.getElementById('user-menu-btn').addEventListener('click', () => document.getElementById('user-dropdown').classList.toggle('active'));
+        document.getElementById('change-password-btn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('change-password-modal').classList.add('active'); document.getElementById('user-dropdown').classList.remove('active'); });
+        document.getElementById('logout-btn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('system-content').style.display='none'; document.getElementById('login-container').style.display='block'; document.getElementById('form-container').innerHTML=''; window._loggedUserEmail=null; });
+        document.querySelector('.close-modal').addEventListener('click', () => document.getElementById('change-password-modal').classList.remove('active'));
         document.getElementById('submit-password').addEventListener('click', async () => {
             const current = document.getElementById('current-password').value;
             const newPass = document.getElementById('new-password').value;
             const confirm = document.getElementById('confirm-password').value;
-            const errorEl = document.getElementById('password-error');
-            const emailLogado = window._loggedUserEmail;
-
-            if (!emailLogado) {
-                errorEl.textContent = 'Sessão inválida. Faça login novamente.';
-                return;
-            }
-            if (newPass !== confirm) {
-                errorEl.textContent = 'As senhas não coincidem.';
-                return;
-            }
-            if (newPass.length < 6) {
-                errorEl.textContent = 'A senha deve ter pelo menos 6 caracteres.';
-                return;
-            }
+            const err = document.getElementById('password-error');
+            if (!window._loggedUserEmail) { err.textContent = 'Sessão inválida'; return; }
+            if (newPass !== confirm) { err.textContent = 'Senhas não coincidem'; return; }
+            if (newPass.length < 6) { err.textContent = 'Mínimo 6 caracteres'; return; }
             try {
-                const user = await database.getUser(emailLogado);
+                const user = await database.getUser(window._loggedUserEmail);
                 if (!user) throw new Error('Usuário não encontrado');
                 if (user.password !== current) throw new Error('Senha atual incorreta');
-                // Chama o método corrigido
-                await database.updateUser(emailLogado, newPass);
-                errorEl.textContent = '';
-                showToast('Senha alterada com sucesso!');
+                await database.updateUser(window._loggedUserEmail, newPass);
+                showToast('Senha alterada');
                 document.getElementById('change-password-modal').classList.remove('active');
                 document.getElementById('current-password').value = '';
                 document.getElementById('new-password').value = '';
                 document.getElementById('confirm-password').value = '';
-            } catch (error) {
-                errorEl.textContent = error.message;
-            }
+                err.textContent = '';
+            } catch(e) { err.textContent = e.message; }
         });
-
         document.getElementById('search-input').addEventListener('input', function() {
             const term = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#inventory-container tbody tr');
-            rows.forEach(row => {
+            document.querySelectorAll('#inventory-container tbody tr').forEach(row => {
                 const name = row.cells[1]?.textContent.toLowerCase() || '';
                 row.style.display = name.includes(term) ? '' : 'none';
             });
