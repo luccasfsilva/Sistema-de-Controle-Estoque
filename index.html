@@ -628,6 +628,25 @@
             transition: transform 0.3s ease;
         }
 
+        .card-dashboard {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+.card-dashboard:hover {
+    transform: translateY(-4px);
+}
+.card-dashboard h3 {
+    color: var(--primary-dark);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
         .toast.show {
             transform: translateX(0);
         }
@@ -768,12 +787,31 @@
             </div>
             <div id="inventory-container"></div>
         </div>
-        <div id="dashboard-container" class="dashboard-container">
-            <h2>Dashboard de Estoque</h2>
-            <div class="chart-container">
-                <canvas id="estoqueChart"></canvas>
-            </div>
+        <div id="dashboard-container" class="dashboard-container" style="display: none;">
+    <h2>📊 Dashboard de Estoque</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-top: 20px;">
+        <!-- Gráfico 1: Barras - Valor por Setor -->
+        <div class="card-dashboard">
+            <h3><i class="fas fa-chart-bar"></i> Estoque por Setor</h3>
+            <canvas id="barChartSetor" style="max-height: 300px; width: 100%;"></canvas>
         </div>
+        <!-- Gráfico 2: Pizza - Distribuição por Setor -->
+        <div class="card-dashboard">
+            <h3><i class="fas fa-chart-pie"></i> Distribuição por Setor</h3>
+            <canvas id="pieChartSetor" style="max-height: 300px; width: 100%;"></canvas>
+        </div>
+        <!-- Gráfico 3: Linha - Movimentação Mensal (ordenado por data) -->
+        <div class="card-dashboard">
+            <h3><i class="fas fa-chart-line"></i> Movimentação Mensal (ordenado por data)</h3>
+            <canvas id="lineChartMov" style="max-height: 300px; width: 100%;"></canvas>
+        </div>
+        <!-- Gráfico 4: Torre (horizontal) - Top Itens -->
+        <div class="card-dashboard">
+            <h3><i class="fas fa-trophy"></i> Top 5 Itens em Estoque</h3>
+            <canvas id="towerChartTop" style="max-height: 300px; width: 100%;"></canvas>
+        </div>
+    </div>
+</div>
     </div>
 </div>
 
