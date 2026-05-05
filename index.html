@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Estoque Moderno - Dashboard com Datas</title>
+    <title>Controle de Estoque Moderno - Atualização em Tempo Real</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Seus estilos originais (não mudei nada aqui) */
+        /* ESTILOS ORIGINAIS (MANTIDOS) */
         :root {
             --primary: #4361ee;
             --primary-dark: #3a0ca3;
@@ -65,7 +65,7 @@
         tr:nth-child(even) { background-color: #f8f9fa; }
         tr:hover { background-color: #f0f5ff; }
         .action-cell { display: flex; justify-content: center; gap: 8px; }
-        .action-btn { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
+        .action-btn { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: 0.2s; }
         .action-btn.edit { background: var(--success); color: white; }
         .action-btn.delete { background: var(--danger); color: white; }
         .action-btn:hover { transform: translateY(-2px); }
@@ -102,6 +102,7 @@
         .toast.error { background: var(--danger); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) { .actions { grid-template-columns: 1fr; } .search-box { width: 100%; margin-bottom: 15px; } .table-controls { flex-direction: column; } header { flex-direction: column; text-align: center; gap: 15px; } .user-menu { width: 100%; } .user-info { justify-content: center; } }
+        .sync-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(76,201,240,0.2); padding: 5px 12px; border-radius: 20px; font-size: 12px; color: var(--primary-dark); }
     </style>
 </head>
 <body>
@@ -160,7 +161,7 @@
     <!-- Sistema principal -->
     <div id="system-content" style="display:none;">
         <header>
-            <div class="logo-area"><div class="logo"><i class="fas fa-boxes"></i></div><h1>Controle de Estoque</h1></div>
+            <div class="logo-area"><div class="logo"><i class="fas fa-boxes"></i></div><h1>Controle de Estoque <span class="sync-badge"><i class="fas fa-sync-alt"></i> Tempo Real</span></h1></div>
             <div class="user-menu">
                 <div class="user-info" id="user-menu-btn">
                     <div class="avatar" id="user-avatar">U</div>
@@ -183,7 +184,7 @@
             <div id="inventory-container"></div>
         </div>
         <div id="dashboard-container" class="dashboard-container">
-            <h2>📊 Dashboard de Estoque</h2>
+            <h2>📊 Dashboard de Estoque (Atualização Automática)</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-top: 20px;">
                 <div class="card-dashboard"><h3><i class="fas fa-chart-bar"></i> Estoque por Setor</h3><canvas id="barChartSetor" style="max-height:300px; width:100%;"></canvas></div>
                 <div class="card-dashboard"><h3><i class="fas fa-chart-pie"></i> Distribuição por Setor</h3><canvas id="pieChartSetor" style="max-height:300px; width:100%;"></canvas></div>
@@ -197,10 +198,18 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+    // CONFIGURAÇÃO SUPABASE
     const SUPABASE_URL = "https://ayfsfkxnjjqbgeqjuhjc.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5ZnNma3huampxYmdlcWp1aGpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MzExMjIsImV4cCI6MjA5MjIwNzEyMn0.cwUnioEFpEbwtkxmtq-4CFjDjw3xPUO17wBzIXSNAlM";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    let inventoryData = [];
+    let barChart, pieChart, lineChart, towerChart;
+    let realtimeChannel = null;
+    let currentSearchTerm = "";
+    let isDashboardVisible = false;
 
+    // Classe Database (operações CRUD)
     class Database {
         async registerUser(user) { const { error } = await supabaseClient.from('users').insert([user]); if (error) throw error; }
         async getUser(email) { const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).single(); if (error) return null; return data; }
@@ -211,10 +220,8 @@
         async deleteItem(codigo) { const { error } = await supabaseClient.from('inventory').delete().eq('codigo', codigo); if (error) throw error; }
     }
     const database = new Database();
-    let inventoryData = [];
-    // Variáveis para os gráficos
-    let barChart, pieChart, lineChart, towerChart;
 
+    // Helpers
     function showToast(msg, isErr = false) {
         const toast = document.getElementById('toast');
         document.getElementById('toast-message').textContent = msg;
@@ -228,10 +235,12 @@
         return map[setor] || 'setor-administrativo';
     }
 
-    // ATUALIZA TODOS OS GRÁFICOS (com ordenação por data no de linha)
+    // ATUALIZAÇÃO DOS GRÁFICOS (Baseado nos dados globais)
     function atualizarTodosGraficos() {
+        if (!isDashboardVisible) return;
         if (!inventoryData || inventoryData.length === 0) {
             [barChart, pieChart, lineChart, towerChart].forEach(ch => { if (ch) ch.destroy(); });
+            barChart = pieChart = lineChart = towerChart = null;
             return;
         }
         // 1. Barras por setor (soma da quantidade após saída)
@@ -280,24 +289,60 @@
         });
     }
 
-    // Exibir inventário (sem chamar updateChart antiga)
-    async function viewInventory() {
+    // Renderiza a tabela de inventário (com filtro de busca aplicado)
+    function renderTable() {
         const container = document.getElementById('inventory-container');
-        try {
-            inventoryData = await database.getInventory();
-            if (inventoryData.length === 0) { container.innerHTML = "<p style='text-align:center; padding:30px;'>Nenhum item no estoque.</p>"; return; }
-            inventoryData.sort((a,b) => a.nome.localeCompare(b.nome));
-            container.innerHTML = `<table><thead><tr><th>Código</th><th>Nome <i class='fas fa-sort-alpha-down'></i></th><th>Quantidade</th><th>Saída</th><th>Após Saída</th><th>Data</th><th>Setor</th><th>Ações</th></tr></thead><tbody>
-                ${inventoryData.map(item => `<tr>
-                    <td>${item.codigo}</td><td>${item.nome}</td><td>${item.quantidade}</td><td>${item.saida}</td><td>${item.quantidadeAposSaida}</td>
-                    <td>${formatDate(item.data)}</td><td><span class="setor-badge ${getSetorClass(item.setor)}">${item.setor}</span></td>
-                    <td class="action-cell"><button class="action-btn edit" data-codigo="${item.codigo}"><i class="fas fa-edit"></i></button><button class="action-btn delete" data-codigo="${item.codigo}"><i class="fas fa-trash"></i></button></td>
-                </tr>`).join('')}</tbody></table>`;
-            document.querySelectorAll('.action-btn.edit').forEach(btn => btn.addEventListener('click', () => { const item = inventoryData.find(i => i.codigo === btn.dataset.codigo); showUpdateFormWithData(item); }));
-            document.querySelectorAll('.action-btn.delete').forEach(btn => btn.addEventListener('click', async () => { if(confirm('Remover?')) { await database.deleteItem(btn.dataset.codigo); await viewInventory(); atualizarTodosGraficos(); showToast('Item removido'); } }));
-        } catch(e) { showToast('Erro carregar estoque: '+e.message, true); }
+        if (!inventoryData.length) {
+            container.innerHTML = "<p style='text-align:center; padding:30px;'>Nenhum item no estoque.</p>";
+            return;
+        }
+        let filteredData = [...inventoryData];
+        if (currentSearchTerm) {
+            filteredData = filteredData.filter(item => item.nome.toLowerCase().includes(currentSearchTerm));
+        }
+        filteredData.sort((a,b) => a.nome.localeCompare(b.nome));
+        container.innerHTML = `<table><thead><tr><th>Código</th><th>Nome <i class='fas fa-sort-alpha-down'></i></th><th>Quantidade</th><th>Saída</th><th>Após Saída</th><th>Data</th><th>Setor</th><th>Ações</th></tr></thead><tbody>
+            ${filteredData.map(item => `<tr>
+                <td>${item.codigo}</td><td>${item.nome}</td><td>${item.quantidade}</td><td>${item.saida}</td><td>${item.quantidadeAposSaida}</td>
+                <td>${formatDate(item.data)}</td><td><span class="setor-badge ${getSetorClass(item.setor)}">${item.setor}</span></td>
+                <td class="action-cell"><button class="action-btn edit" data-codigo="${item.codigo}"><i class="fas fa-edit"></i></button><button class="action-btn delete" data-codigo="${item.codigo}"><i class="fas fa-trash"></i></button></td>
+            </tr>`).join('')}</tbody></table>`;
+        // Reatribuir eventos
+        document.querySelectorAll('.action-btn.edit').forEach(btn => btn.addEventListener('click', () => {
+            const item = inventoryData.find(i => i.codigo === btn.dataset.codigo);
+            if(item) showUpdateFormWithData(item);
+        }));
+        document.querySelectorAll('.action-btn.delete').forEach(btn => btn.addEventListener('click', async () => {
+            if(confirm('Remover permanentemente?')) {
+                await database.deleteItem(btn.dataset.codigo);
+                showToast('Item removido');
+                // A atualização real virá via realtime, mas já forçamos refresh manual para agilidade
+                await refreshInventoryAndUI();
+            }
+        }));
     }
 
+    // Busca dados do Supabase e atualiza a UI completa (tabela + gráficos)
+    async function refreshInventoryAndUI() {
+        try {
+            const newData = await database.getInventory();
+            inventoryData = newData;
+            renderTable();
+            if (isDashboardVisible) {
+                atualizarTodosGraficos();
+            }
+        } catch (e) {
+            console.error("Erro ao sincronizar estoque:", e);
+            showToast("Erro ao sincronizar dados", true);
+        }
+    }
+
+    // Exibir inventário (versão síncrona com os dados globais)
+    async function viewInventory() {
+        await refreshInventoryAndUI();
+    }
+
+    // ADICIONAR ITEM (com atualização automática via realtime + manual)
     function showAddForm() {
         const fc = document.getElementById('form-container');
         fc.innerHTML = `<h2>Adicionar Item</h2><form id="addForm"><div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
@@ -317,10 +362,9 @@
             const saida = parseInt(document.getElementById('saida').value);
             const novo = { codigo: cod, nome: document.getElementById('nome').value, quantidade: qtd, saida: saida, data: document.getElementById('data').value, setor: document.getElementById('setor').value, quantidadeAposSaida: qtd - saida };
             await database.addItem(novo);
-            await viewInventory();
-            atualizarTodosGraficos();
-            fc.innerHTML = '';
             showToast('Item adicionado');
+            fc.innerHTML = '';
+            await refreshInventoryAndUI(); // atualização imediata após inclusão
         });
     }
 
@@ -340,24 +384,43 @@
             const saida = parseInt(document.getElementById('saida').value);
             const up = { codigo: item.codigo, nome: document.getElementById('nome').value, quantidade: qtd, saida: saida, data: document.getElementById('data').value, setor: document.getElementById('setor').value, quantidadeAposSaida: qtd - saida };
             await database.updateItem(up);
-            await viewInventory();
-            atualizarTodosGraficos();
-            fc.innerHTML = '';
             showToast('Item atualizado');
+            fc.innerHTML = '';
+            await refreshInventoryAndUI();
         });
     }
 
+    // Alterna dashboard e garante gráficos atualizados quando exibido
     function toggleDashboard() {
         const dash = document.getElementById('dashboard-container');
-        if (dash.style.display === 'none') {
+        if (dash.style.display === 'none' || !dash.style.display) {
             dash.style.display = 'block';
+            isDashboardVisible = true;
             atualizarTodosGraficos();
         } else {
             dash.style.display = 'none';
+            isDashboardVisible = false;
         }
     }
 
-    // Autenticação (sem alterações)
+    // CONFIGURAÇÃO DE REALTIME (atualização automática via Supabase)
+    function setupRealtimeSubscription() {
+        if (realtimeChannel) {
+            supabaseClient.removeChannel(realtimeChannel);
+        }
+        realtimeChannel = supabaseClient
+            .channel('inventory-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, async (payload) => {
+                console.log('Mudança detectada no estoque:', payload.eventType);
+                await refreshInventoryAndUI();
+                showToast(`Estoque atualizado em tempo real (${payload.eventType})`);
+            })
+            .subscribe((status) => {
+                console.log('Status da subscrição:', status);
+            });
+    }
+
+    // --- AUTENTICAÇÃO (sem alterações relevantes, mas com refresh ao logar) ---
     function showLoginForm() { document.getElementById('register-container').style.display='none'; document.getElementById('reset-container').style.display='none'; document.getElementById('login-container').style.display='block'; document.getElementById('login-error').innerText=''; }
     function showRegisterForm() { document.getElementById('login-container').style.display='none'; document.getElementById('reset-container').style.display='none'; document.getElementById('register-container').style.display='block'; document.getElementById('register-error').innerText=''; }
     function showResetForm() { document.getElementById('login-container').style.display='none'; document.getElementById('register-container').style.display='none'; document.getElementById('reset-container').style.display='block'; document.getElementById('reset-error').innerText=''; document.getElementById('reset-success').innerText=''; }
@@ -391,8 +454,11 @@
             document.getElementById('system-content').style.display = 'block';
             document.getElementById('username-display').textContent = user.name;
             document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-            await viewInventory();
-            atualizarTodosGraficos();  // gráficos atualizados
+            // Carregar dados e ativar realtime
+            await refreshInventoryAndUI();
+            setupRealtimeSubscription();
+            isDashboardVisible = false;
+            document.getElementById('dashboard-container').style.display = 'none';
         } catch(e) { err.textContent = e.message; }
     }
     async function register() {
@@ -417,7 +483,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('user-menu-btn').addEventListener('click', () => document.getElementById('user-dropdown').classList.toggle('active'));
         document.getElementById('change-password-btn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('change-password-modal').classList.add('active'); document.getElementById('user-dropdown').classList.remove('active'); });
-        document.getElementById('logout-btn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('system-content').style.display='none'; document.getElementById('login-container').style.display='block'; document.getElementById('form-container').innerHTML=''; window._loggedUserEmail=null; });
+        document.getElementById('logout-btn').addEventListener('click', (e) => { e.preventDefault(); if(realtimeChannel) supabaseClient.removeChannel(realtimeChannel); document.getElementById('system-content').style.display='none'; document.getElementById('login-container').style.display='block'; document.getElementById('form-container').innerHTML=''; window._loggedUserEmail=null; isDashboardVisible=false; });
         document.querySelector('.close-modal').addEventListener('click', () => document.getElementById('change-password-modal').classList.remove('active'));
         document.getElementById('submit-password').addEventListener('click', async () => {
             const current = document.getElementById('current-password').value;
@@ -441,11 +507,8 @@
             } catch(e) { err.textContent = e.message; }
         });
         document.getElementById('search-input').addEventListener('input', function() {
-            const term = this.value.toLowerCase();
-            document.querySelectorAll('#inventory-container tbody tr').forEach(row => {
-                const name = row.cells[1]?.textContent.toLowerCase() || '';
-                row.style.display = name.includes(term) ? '' : 'none';
-            });
+            currentSearchTerm = this.value.toLowerCase();
+            renderTable();
         });
     });
 </script>
